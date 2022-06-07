@@ -12,13 +12,10 @@ exports.handler = (event, context, callback) => {
       secret = JSON.parse(data.SecretString);
     }
 
-    //ServerId is stored in Secrets Manager
-    if (secret.serverId !== "") {
       //Once secrets are fetched, we compare username and password entered with the ones available in secrets.
-      if (event.username === secret[event.username + ".USERNAME"]) {
-        if (event.password === secret[event.username + ".PASSWORD"]) {
-        //HomeDirectory is the S3 bucket name + subfolder where the files will be pushed. For example, /S3FTP/striker
-        //Role is also stored in secrets
+      if (event.username === secret[event.username + ".USERNAME"] && event.password === secret[event.username + ".PASSWORD"]) {
+        //HomeDirectoryDetails is the S3 bucket name + subfolder where the files will be pushed. For example, /S3FTP/striker and Entry represent the point of entry. For example, /striker
+        //Role ARN is also stored in secrets and has defined the user's permissions to perform within the FTPS such as read, write, delete, etc.
           response = {
             Role: secret.role,
             HomeDirectoryType: "LOGICAL",
@@ -27,12 +24,6 @@ exports.handler = (event, context, callback) => {
         } else {
           response = {}
         }
-      } else {
-        response = {}
-      }
-    } else {
-      response = {};
-    }
 
     console.log("Response:", JSON.stringify(response));
     callback(null, response);
